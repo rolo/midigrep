@@ -1,6 +1,6 @@
 # Midi grep
 
-Find consecutive notes in midi files
+Find midi files with consecutive notes.
 
 ### Example: 
 
