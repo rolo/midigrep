@@ -2,10 +2,13 @@ extern crate nom_midi as midi;
 extern crate nom;
 extern crate walkdir;
 extern crate rayon;
+extern crate docopt;
+#[macro_use] extern crate serde_derive;
 
 use std::path::PathBuf;
 use std::env;
 
+use docopt::Docopt;
 use rayon::prelude::*;
 use walkdir::WalkDir;
 
@@ -13,22 +16,46 @@ mod midifind;
 mod str_to_note;
 
 
-fn main() {
-    let args: Vec<_> = env::args().collect();
-    if args.len() < 2 {
-        println!("Supply directory");
-        return;
-    }
-    
-    let notes = args.into_iter().skip(2).collect::<Vec<String>>();
-    let notes = str_to_note::to_notes(notes);
+const USAGE: &'static str = "
+midigrep
 
-    if notes.len() == 0 {
-        println!("Invalid notes. enter notes as follows: c1 c2 b3 etc.");
+Usage:
+    midigrep <path> <notes>...
+    midigrep (-h | --help)
+    midigrep (-v | --version)
+
+Example:
+    midigrep ~/midi c1 cs2 b4
+
+Options:
+    -h --help           Show this screen
+    -n --notes          List of consequtive notes to search for
+    -v --version        Print version
+";
+
+#[derive(Debug, Deserialize)]
+struct Args {
+    arg_path: Option<String>,
+    arg_notes: Vec<String>,
+    flag_version: bool,
+}
+
+fn main() {
+    let args: Args = Docopt::new(USAGE)
+        .and_then(|d| d.deserialize())
+        .unwrap_or_else(|e| e.exit());
+
+    if args.flag_version {
+        let version = env!("CARGO_PKG_VERSION");
+        println!("");
+        println!("midigrep");
+        println!("--------");
+        println!("version: {}", version);
         return
     }
 
-    let capacity = 10000;
+    let notes = str_to_note::to_notes(args.arg_notes);
+    let capacity = 1000;
     let mut queue = Vec::with_capacity(capacity);
 
     if let Some(pth) = env::args().nth(1) {

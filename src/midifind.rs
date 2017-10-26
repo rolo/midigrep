@@ -15,7 +15,10 @@ pub fn is_good_midi(pth: &Path, notes: &[Note]) -> bool {
     let file = File::open(pth).unwrap();
     let mut buffer = Vec::new();
     let mut reader = io::BufReader::new(file);
-    reader.read_to_end(&mut buffer);
+    if let Err(e) = reader.read_to_end(&mut buffer) {
+        println!("Failed to read file: {:?}", e);
+        return false
+    }
 
     let midi_parsed = midi::parser::parse_midi(&buffer);
 
