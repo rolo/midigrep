@@ -1,0 +1,10 @@
+[package]
+name = "midigrep"
+version = "0.1.0"
+authors = ["Jonas Hagstedt <hagstedt@gmail.com>"]
+
+[dependencies]
+nom-midi = "*"
+nom = "*"
+walkdir = "2"
+rayon = "*"
