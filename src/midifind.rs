@@ -4,7 +4,7 @@ extern crate nom;
 use colored::*;
 
 use std::io;
-use std::io::{Read, Write};
+use std::io::Read;
 use std::fs::File;
 use std::path::Path;
 
@@ -116,7 +116,7 @@ pub fn print_notes(pth: &Path, notes: &[Note], print_color: bool) {
         result.iter().map(|note| {
             match note {
                 &MidiNoteOutput::Note(n) => format!("{:?} ", n),
-                &MidiNoteOutput::MatchedNote(n) => format!("{:?} ", n),
+                &MidiNoteOutput::MatchedNote(n) => format!("[{:?}] ", n),
             }
         }).collect::<String>()
     };
