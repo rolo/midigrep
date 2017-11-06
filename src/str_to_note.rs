@@ -3,6 +3,8 @@ use midi::note::Note;
 fn str_to_note(n: &str) -> Option<Note> {
     match n {
         // A
+        "a1" => Some(Note::A1),
+        "a2" => Some(Note::A2),
         "a3" => Some(Note::A3),
         "a4" => Some(Note::A4),
         "a5" => Some(Note::A5),
@@ -113,14 +115,14 @@ fn str_to_note(n: &str) -> Option<Note> {
     }
 }
 
-pub fn to_notes(s: Vec<String>) -> Vec<Note> {
+pub fn to_notes(s: Vec<String>) -> Result<Vec<Note>, ()> {
     let mut v = Vec::with_capacity(s.len());
     for c in s {
         let n = str_to_note(&c.to_lowercase());
         match n {
             Some(note) => v.push(note),
-            None => { }
+            None => { println!("Invalid note: {}", c) }
         }
     }
-    v
+    Ok(v)
 }

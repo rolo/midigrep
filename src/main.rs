@@ -6,6 +6,7 @@ extern crate docopt;
 extern crate colored;
 #[macro_use] extern crate serde_derive;
 
+use std::process;
 use std::path::PathBuf;
 use std::env;
 
@@ -22,8 +23,8 @@ midigrep
 
 Usage:
     midigrep <path> <notes>...
-    midigrep <path> -s <notes>...
-    midigrep <path> -s -c <notes>...
+    midigrep -s <path> <notes>...
+    midigrep -s -c <path> <notes>...
     midigrep (-h | --help)
     midigrep (-v | --version)
 
@@ -61,13 +62,19 @@ fn main() {
         return
     }
 
-    let notes = str_to_note::to_notes(args.arg_notes);
+    let notes = str_to_note::to_notes(args.arg_notes).expect("Failed to parse all notes");
+
+    if notes.len() == 0 {
+        println!("No valid notes supplied");
+        process::exit(1);
+    }
+
     let capacity = 1000;
     let mut queue = Vec::with_capacity(capacity);
     let show_notes = args.flag_show_notes;
     let show_color = args.flag_color;
 
-    if let Some(pth) = env::args().nth(1) {
+    if let Some(pth) = args.arg_path {
         let walker = WalkDir::new(pth).follow_links(true).into_iter();
 
         for entry in walker {
