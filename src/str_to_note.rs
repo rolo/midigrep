@@ -119,7 +119,7 @@ pub fn to_notes(s: Vec<String>) -> Vec<Note> {
         let n = str_to_note(&c.to_lowercase());
         match n {
             Some(note) => v.push(note),
-            None => {}
+            None => { }
         }
     }
     v

@@ -1,6 +1,9 @@
 # Midi grep
 
 Find midi files with consecutive notes.
+Use `#` to signify a sharp note (e.g `c#2`)
+
+Don't use coloured output if you print the results to a file
 
 ### Example: 
 
@@ -20,11 +23,13 @@ Usage:
     midigrep (-v | --version)
 
 Example:
-    midigrep ~/midi c1 cs2 b4
+    midigrep ~/midi c1 c#2 b4
 
 Options:
     -h --help           Show this screen
     -n --notes          List of consequtive notes to search for
+    -s --show-notes     Show all notes of each file
+    -c --color          Use colored output (used with -s)
     -v --version        Print version
 ```
 
@@ -33,6 +38,7 @@ Options:
 Processing 192,981 midi files:
 
 ```
+# benchmark done before colored output was introduced
 time ./bin/midigrep ~/Downloads/ c3 c4|wc -l
 18177
 

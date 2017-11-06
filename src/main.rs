@@ -3,6 +3,7 @@ extern crate nom;
 extern crate walkdir;
 extern crate rayon;
 extern crate docopt;
+extern crate colored;
 #[macro_use] extern crate serde_derive;
 
 use std::path::PathBuf;
@@ -21,15 +22,19 @@ midigrep
 
 Usage:
     midigrep <path> <notes>...
+    midigrep -s <path> <notes>...
+    midigrep -s -c <path> <notes>...
     midigrep (-h | --help)
     midigrep (-v | --version)
 
 Example:
-    midigrep ~/midi c1 cs2 b4
+    midigrep ~/midi c1 c#2 b4
 
 Options:
     -h --help           Show this screen
     -n --notes          List of consequtive notes to search for
+    -s --show-notes     Show all notes of each file
+    -c --color          Use colored output (used with -s)
     -v --version        Print version
 ";
 
@@ -37,6 +42,8 @@ Options:
 struct Args {
     arg_path: Option<String>,
     arg_notes: Vec<String>,
+    flag_show_notes: bool,
+    flag_color: bool,
     flag_version: bool,
 }
 
@@ -57,6 +64,8 @@ fn main() {
     let notes = str_to_note::to_notes(args.arg_notes);
     let capacity = 1000;
     let mut queue = Vec::with_capacity(capacity);
+    let show_notes = args.flag_show_notes;
+    let show_color = args.flag_color;
 
     if let Some(pth) = env::args().nth(1) {
         let walker = WalkDir::new(pth).follow_links(true).into_iter();
@@ -72,15 +81,11 @@ fn main() {
                         if queue.len() == capacity {
                             queue.par_iter().for_each(|pth| {
                                 if midifind::is_good_midi(pth, &notes) {
-                                    println!("{:?}", pth);
+                                    find_print(pth, &notes, show_notes, show_color);
                                 }
                             });
                             queue.clear();
                         }
-                        //queue.push(e.path());
-                        // if midifind::is_good_midi(e.path(), &notes) {
-                        //     println!("{:?}", e.path());
-                        // }
                     }
                 },
                 _=> {}
@@ -89,8 +94,15 @@ fn main() {
 
         queue.par_iter().for_each(|pth| {
             if midifind::is_good_midi(pth, &notes) {
-                println!("{:?}", pth);
+                find_print(pth, &notes, show_notes, show_color);
             }
         });
+    }
+}
+
+fn find_print(pth: &PathBuf, notes: &[midi::note::Note], show_notes: bool, show_color: bool) {
+    println!("{:?}", pth);
+    if show_notes {
+        midifind::print_notes(pth, &notes, show_color);
     }
 }
